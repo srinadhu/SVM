@@ -52,7 +52,7 @@ def uniform(rows,C):
 
 	return alpha
 
-def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=2):
+def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=9):
 	''' X has input data matrix. Y has the class labels. C is regularization parameter. tol is numerical tolerance. max_passes is max # of times to iterate wihtout changing alpha's
 
         Return Alpha and b.'''
