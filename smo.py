@@ -9,6 +9,7 @@ reference: http://cs229.stanford.edu/materials/smo.pdf
 import numpy as np #for dealing with matrices.
 import math #for exponential and power function
 import random #for random number generation
+import copy
 
 
 
@@ -41,28 +42,28 @@ def predict(X,Y,alpha,b,x):
 
 	return result
 
-def uniform(rows):
+def uniform(rows,C):
 	'''returns the alphas with range between 0 and C'''
 
 	alpha=np.zeros(shape=(rows,1))
 
 	for i in range(alpha.shape[0]):
-		alpha[i]=random.uniform(0.0,1) #generating uniform between 0 and C
+		alpha[i]=random.uniform(0.0,2*C) #generating uniform between 0 and C
 
 	return alpha
 
-def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=15):
+def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=2):
 	''' X has input data matrix. Y has the class labels. C is regularization parameter. tol is numerical tolerance. max_passes is max # of times to iterate wihtout changing alpha's
 
         Return Alpha and b.'''
 
-	alpha=uniform(X.shape[0]); # each alpha[i] for every example.
+	alpha=uniform(X.shape[0],C); # each alpha[i] for every example.
 	b=0.0
 	
 	passes=0
 
 	E=np.zeros(shape=(X.shape[0],1)) #will be used in the loop
-	alpha_old=alpha #will be used in the loop
+	alpha_old=copy.deepcopy(alpha) #will be used in the loop
 
 	while(passes < max_passes):
 		num_changed_alphas=0
@@ -98,7 +99,7 @@ def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=15):
 			
 				if (eta >= 0):
 					continue
-	
+			
 				#clipping
 				if (alpha[j] > H):
 					alpha[j]=H
@@ -106,10 +107,11 @@ def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=15):
 					alpha[j]=L
 				else:
 					alpha[j]=alpha[j]
-
+	
 				if (abs(alpha[j]-alpha_old[j]) < tol):
 					continue
-				print "Thank God"
+				#print "Thank God"
+				#print i,j
 				alpha[i] += (Y[i]*Y[j]*(alpha_old[j] - alpha[j])) #both alphas are updated
 
 				b1= b-E[i]-(Y[i]*(alpha[i]-alpha_old[i])*(gaussian_kernel(X[i,:],X[i,:])))-(Y[j]*(alpha[j]-alpha_old[j])*(gaussian_kernel(X[i,:],X[j,:])))
