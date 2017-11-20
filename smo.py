@@ -19,7 +19,7 @@ def gaussian_kernel(x1,x2,sigma=0.5):
 	norm= np.linalg.norm(np.subtract(x1,x2)) #norm 
 
 	res= math.exp(-(norm**2)/(2*(sigma**2))) #returning the final dot product.
-
+	
 	return res
 
 def polynomial_kernel(x1,x2,degree=1):
@@ -30,13 +30,13 @@ def polynomial_kernel(x1,x2,degree=1):
 	return (dot_prdt+1)**degree  #returning the final dot product.
 
 
-def predict(X,Y,alpha,b,x):
+def predict(X,Y,alpha,b,x,sigma):
 	'''predict the value for a new data point'''
 
-	result=0
+	result=0.0
 
 	for i in range(X.shape[0]):
-		result+=(alpha[i]*Y[i]*gaussian_kernel(X[i,:] , x));
+		result+=(alpha[i]*Y[i]*polynomial_kernel(X[i,:] , x,sigma));
 
 	result+=b
 
@@ -48,11 +48,11 @@ def uniform(rows,C):
 	alpha=np.zeros(shape=(rows,1))
 
 	for i in range(alpha.shape[0]):
-		alpha[i]=random.uniform(0.0,2*C) #generating uniform between 0 and C
+		alpha[i]=random.uniform(-C,C) #generating uniform between 0 and C
 
 	return alpha
 
-def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=9):
+def SMO(X,Y,C=2.0,tol=math.pow(10,-5),max_passes=30,sigma=1):
 	''' X has input data matrix. Y has the class labels. C is regularization parameter. tol is numerical tolerance. max_passes is max # of times to iterate wihtout changing alpha's
 
         Return Alpha and b.'''
@@ -63,21 +63,20 @@ def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=9):
 	passes=0
 
 	E=np.zeros(shape=(X.shape[0],1)) #will be used in the loop
-	alpha_old=copy.deepcopy(alpha) #will be used in the loop
+	alpha_old=copy.deepcopy(alpha) #deepcopy otherwise will do a shallow copy which will result in unwanted change of variables
 
 	while(passes < max_passes):
 		num_changed_alphas=0
-		print passes
 	
 		for i in range(X.shape[0]): #for every example
-			E[i]=(predict(X,Y,alpha,b,X[i,:])-Y[i])
+			E[i]=(predict(X,Y,alpha,b,X[i,:],sigma)-Y[i])
  		
 			if ( (-Y[i]*E[i]>tol and -alpha[i]>-C) or (Y[i]*E[i]>tol and alpha[i]>0) ):
 				j=i
 				while(j==i):
 					j=random.randrange(X.shape[0]) #get any other data point other than i
 	
-				E[j] = (predict(X,Y,alpha,b,X[j,:])-Y[j]) #for other data point
+				E[j] = (predict(X,Y,alpha,b,X[j,:],sigma)-Y[j]) #for other data point
 
 				alpha_old[i]=alpha[i]
 				alpha_old[j]=alpha[j]
@@ -93,9 +92,9 @@ def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=9):
 		
 				if (L==H):
 					continue
-				eta = 2*gaussian_kernel(X[i,:],X[j,:])
-				eta=eta-gaussian_kernel(X[i,:],X[i,:])
-				eta=eta-gaussian_kernel(X[j,:],X[j,:])
+				eta = 2*polynomial_kernel(X[i,:],X[j,:],sigma)
+				eta=eta-polynomial_kernel(X[i,:],X[i,:],sigma)
+				eta=eta-polynomial_kernel(X[j,:],X[j,:],sigma)
 			
 				if (eta >= 0):
 					continue
@@ -114,16 +113,19 @@ def SMO(X,Y,C=0.5,tol=math.pow(10,-5),max_passes=9):
 				#print i,j
 				alpha[i] += (Y[i]*Y[j]*(alpha_old[j] - alpha[j])) #both alphas are updated
 
-				b1= b-E[i]-(Y[i]*(alpha[i]-alpha_old[i])*(gaussian_kernel(X[i,:],X[i,:])))-(Y[j]*(alpha[j]-alpha_old[j])*(gaussian_kernel(X[i,:],X[j,:])))
-				b2= b-E[j]-(Y[i]*(alpha[i]-alpha_old[i])*(gaussian_kernel(X[i,:],X[j,:])))-(Y[j]*(alpha[j]-alpha_old[j])*(gaussian_kernel(X[j,:],X[j,:])))
+				ii = polynomial_kernel(X[i,:],X[i,:],sigma)
+				ij = polynomial_kernel(X[i,:],X[j,:],sigma)
+				jj = polynomial_kernel(X[j,:],X[j,:],sigma)			
 
+				b1= b-E[i]- (Y[i]*ii*(alpha[i]-alpha_old[i]))- (Y[j]*ij*(alpha[j]-alpha_old[j]))
+				b2= b-E[j]- (Y[i]*ij*(alpha[i]-alpha_old[i]))- (Y[j]*jj*(alpha[j]-alpha_old[j]))
 				if (alpha[i] > 0 and alpha[i]<C):
 					b=b1
 				elif (alpha[j] > 0 and alpha[j] <C):
 					b=b2
 				else:
 					b=(b1+b2)/2.0
-				
+			
 				num_changed_alphas+=1
 			#ended if
 		#ended for

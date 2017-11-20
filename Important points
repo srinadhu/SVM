@@ -32,3 +32,18 @@ Data - Artificial Data.
 Data - Higgs Boson.
 
 https://neerajkumar.org/writings/svm/
+
+########################################################
+Polynomial Kernel function vs degree (fix C=2.0 and fix maxpasses=30,tol=pow(10,-5))
+	1.training classification and testing classification error
+	2.3 types of support vectors (plot's )
+
+(for best one vary C and see it's plot)
+
+
+Gaussian kernel vs sigma (fix C=2.0 and fix maxpasses=30,tol=pow(10,-5))
+	1.training and testing classification error
+	2.3 types of support vectos (plot's)
+
+(for best one vary C and see it's plot)
+
