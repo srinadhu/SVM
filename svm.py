@@ -79,38 +79,31 @@ def Matrices(filename):
 
 	return X,Y
 
-def alphas(alpha,C=2.0):
+def alphas(alpha):
 	'''returns the number of ranges of them'''
 	a=0
-	b=0
-	c=0
 	for i in range(alpha.shape[0]):
-		if (alpha[i]==0.0):
+		if (alpha[i] > 0.0):
 			a+=1
-		elif (alpha[i]==C):
-			b+=1
-		else:
-			c+=1
-	return a,b,c
+		
+	return a
 
-def plot(Train_error,Test_error,alphas_cc,alphas_mc,alphas_rm,Sigmas):
+def plot(Train_error,Test_error,support_vectors,Sigmas):
 	'''returns the plots'''
 	
 	plt.plot(Sigmas,Train_error,color='r')
 	plt.plot(Sigmas,Test_error,color='b')
-	plt.xlabel("Degree")
+	plt.xlabel("sigma")
 	plt.ylabel("Train & Test Accuracy")
-	plt.title("Classification vs Degree of Polynomial Kernel. \n(r-train\nb-test)\n")
+	plt.title("Accuracy vs Sigma of Gaussian Kernel. \n(r-train\nb-test)\n")
 	plt.savefig("./class_error.png", bbox_inches='tight')
 	plt.clf()
 
 
-	plt.plot(Sigmas,alphas_cc,color='r')
-	plt.plot(Sigmas,alphas_mc,color='b')
-	plt.plot(Sigmas,alphas_rm,color='g')
-	plt.xlabel("Degree")
-	plt.ylabel("Support Vectors")
-	plt.title("Support Vectors vs Degree. \n(r-Lagrange multipler value 0\nb-Lagrange multipler value C\ng-Lagrange multipler value b/w 0 and C)\n")
+	plt.plot(Sigmas,support_vectors,color='r')
+	plt.xlabel("sigma")
+	plt.ylabel("No of Support Vectors")
+	plt.title("No of Support Vectors vs sigma.")
 	plt.savefig("./support_vectors.png", bbox_inches='tight')
 	plt.clf()
 
@@ -120,27 +113,22 @@ X_test,Y_test=Matrices("test")
 Train_error=[]
 Test_error=[]
 Sigmas=[]
-alphas_cc=[] #correctly classfied
-alphas_mc=[] #mis classified
-alphas_rm=[] #middle ones
+support_vectors=[]
 
-sigma=0
+sigma=0.0
 
-while(sigma<5):
-	sigma+=1
+while(sigma<0.1):
+	sigma+=0.1
 	Sigmas.append(sigma)
 	print "called SMO"
 	alpha,bias= smo.SMO(X_train,Y_train,1.0,math.pow(10,-3),2,sigma)  #with varying sigma
 	tr_err,tst_err= Error(X_train,Y_train,alpha,bias,X_test,Y_test,sigma)
 	Train_error.append(tr_err)
 	Test_error.append(tst_err)
-	a,b,c = alphas(alpha)
-	print alpha
-	print a,b,c
 	print tr_err
 	print tst_err
-	alphas_cc.append(a)
-	alphas_mc.append(b)
-	alphas_rm.append(c)
+	a = alphas(alpha)
+	print sigma
+	support_vectors.append(a)
 	print "one call done"
-plot(Train_error,Test_error,alphas_cc,alphas_mc,alphas_rm,Sigmas)
+#plot(Train_error,Test_error,support_vectors,Sigmas)

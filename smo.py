@@ -36,7 +36,7 @@ def predict(X,Y,alpha,b,x,sigma):
 	result=0.0
 
 	for i in range(X.shape[0]):
-		result+=(alpha[i]*Y[i]*polynomial_kernel(X[i,:] , x,sigma));
+		result+=(alpha[i]*Y[i]*gaussian_kernel(X[i,:] , x,sigma));
 
 	result+=b
 
@@ -57,7 +57,6 @@ def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 
 	while(passes < max_passes):
 		num_changed_alphas=0
-		
 		for i in range(X.shape[0]): #for every example
 			E[i]=(predict(X,Y,alpha,b,X[i,:],sigma)-Y[i])
  		
@@ -82,9 +81,9 @@ def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 		
 				if (L==H):
 					continue
-				eta = 2*polynomial_kernel(X[i,:],X[j,:],sigma)
-				eta=eta-polynomial_kernel(X[i,:],X[i,:],sigma)
-				eta=eta-polynomial_kernel(X[j,:],X[j,:],sigma)
+				eta = 2*gaussian_kernel(X[i,:],X[j,:],sigma)
+				eta=eta-gaussian_kernel(X[i,:],X[i,:],sigma)
+				eta=eta-gaussian_kernel(X[j,:],X[j,:],sigma)
 			
 				if (eta >= 0):
 					continue
@@ -102,14 +101,13 @@ def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 	
 				if (abs(alpha[j]-alpha_old[j]) < tol):
 					continue
-				#print "Thank God"
-				#print i,j
+			
 				alpha[i] += (Y[i]*Y[j]*(alpha_old[j] - alpha[j])) #both alphas are updated
 
 
-				ii = polynomial_kernel(X[i,:],X[i,:],sigma)
-				ij = polynomial_kernel(X[i,:],X[j,:],sigma)
-				jj = polynomial_kernel(X[j,:],X[j,:],sigma)			
+				ii = gaussian_kernel(X[i,:],X[i,:],sigma)
+				ij = gaussian_kernel(X[i,:],X[j,:],sigma)
+				jj = gaussian_kernel(X[j,:],X[j,:],sigma)			
 
 				b1= b-E[i]- (Y[i]*ii*(alpha[i]-alpha_old[i]))- (Y[j]*ij*(alpha[j]-alpha_old[j]))
 				b2= b-E[j]- (Y[i]*ij*(alpha[i]-alpha_old[i]))- (Y[j]*jj*(alpha[j]-alpha_old[j]))
