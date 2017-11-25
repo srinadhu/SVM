@@ -6,6 +6,7 @@ Written by @srinadhu on Nov 19th.
 import smo  #has the code for optimizer
 import matplotlib.pyplot as plt #for plotting the decision boundary.
 import numpy as np
+import math
 
 def Error(X_train,Y_train,alpha,bias,X_test,Y_test,sigma):
 	''' Error for the test data'''
@@ -98,8 +99,8 @@ def plot(Train_error,Test_error,alphas_cc,alphas_mc,alphas_rm,Sigmas):
 	plt.plot(Sigmas,Train_error,color='r')
 	plt.plot(Sigmas,Test_error,color='b')
 	plt.xlabel("Degree")
-	plt.ylabel("Train & Test error")
-	plt.title("Misclassification vs Degree of Polynomial Kernel. \n(r-train\nb-test)\n")
+	plt.ylabel("Train & Test Accuracy")
+	plt.title("Classification vs Degree of Polynomial Kernel. \n(r-train\nb-test)\n")
 	plt.savefig("./class_error.png", bbox_inches='tight')
 	plt.clf()
 
@@ -125,15 +126,19 @@ alphas_rm=[] #middle ones
 
 sigma=0
 
-while(sigma<20):
+while(sigma<5):
 	sigma+=1
 	Sigmas.append(sigma)
 	print "called SMO"
-	alpha,bias= smo.SMO(X_train,Y_train,sigma)  #with varying sigma
+	alpha,bias= smo.SMO(X_train,Y_train,1.0,math.pow(10,-3),2,sigma)  #with varying sigma
 	tr_err,tst_err= Error(X_train,Y_train,alpha,bias,X_test,Y_test,sigma)
 	Train_error.append(tr_err)
 	Test_error.append(tst_err)
 	a,b,c = alphas(alpha)
+	print alpha
+	print a,b,c
+	print tr_err
+	print tst_err
 	alphas_cc.append(a)
 	alphas_mc.append(b)
 	alphas_rm.append(c)

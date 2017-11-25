@@ -42,22 +42,12 @@ def predict(X,Y,alpha,b,x,sigma):
 
 	return result
 
-def uniform(rows,C):
-	'''returns the alphas with range between 0 and C'''
-
-	alpha=np.zeros(shape=(rows,1))
-
-	for i in range(alpha.shape[0]):
-		alpha[i]=random.uniform(-C,C) #generating uniform between 0 and C
-
-	return alpha
-
-def SMO(X,Y,C=2.0,tol=math.pow(10,-5),max_passes=30,sigma=1):
+def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 	''' X has input data matrix. Y has the class labels. C is regularization parameter. tol is numerical tolerance. max_passes is max # of times to iterate wihtout changing alpha's
 
         Return Alpha and b.'''
 
-	alpha=uniform(X.shape[0],C); # each alpha[i] for every example.
+	alpha=np.zeros(shape=(X.shape[0],1)); # each alpha[i] for every example.
 	b=0.0
 	
 	passes=0
@@ -67,7 +57,7 @@ def SMO(X,Y,C=2.0,tol=math.pow(10,-5),max_passes=30,sigma=1):
 
 	while(passes < max_passes):
 		num_changed_alphas=0
-	
+		
 		for i in range(X.shape[0]): #for every example
 			E[i]=(predict(X,Y,alpha,b,X[i,:],sigma)-Y[i])
  		
@@ -100,18 +90,22 @@ def SMO(X,Y,C=2.0,tol=math.pow(10,-5),max_passes=30,sigma=1):
 					continue
 			
 				#clipping
+				
+				alpha[j]= alpha_old[j]-((Y[j]*(E[i]-E[j]))/eta)
+
 				if (alpha[j] > H):
 					alpha[j]=H
 				elif (alpha[j]<L):
 					alpha[j]=L
 				else:
-					alpha[j]=alpha[j]
+					pass  #do nothing
 	
 				if (abs(alpha[j]-alpha_old[j]) < tol):
 					continue
 				#print "Thank God"
 				#print i,j
 				alpha[i] += (Y[i]*Y[j]*(alpha_old[j] - alpha[j])) #both alphas are updated
+
 
 				ii = polynomial_kernel(X[i,:],X[i,:],sigma)
 				ij = polynomial_kernel(X[i,:],X[j,:],sigma)
