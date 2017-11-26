@@ -39,7 +39,7 @@ def Error(X_train,Y_train,alpha,bias,X_test,Y_test,sigma):
 
 	return (1-(train_error/Y_train.shape[0]))*100.0,(1-(test_error/Y_test.shape[0]))*100.0
 
-def Matrices(filename):
+def Matrices(filename,normalization="yes"):
 	'''returns the file input into matrices for both data and labels'''
 
 	labels=[]	
@@ -62,12 +62,14 @@ def Matrices(filename):
 		for i in range(len(temp)):
 			temp[i]=float(temp[i])
 
-		norm=np.linalg.norm(temp) #norm of the input data
+		if (normalization == "yes"):
+			norm=np.linalg.norm(temp) #norm of the input data
 		
-		for i in range(len(temp)):
-			temp[i]= temp[i]/norm   #normalizing it to 1 and 0.
-		
+			for i in range(len(temp)):
+				temp[i]= temp[i]/norm   #normalizing it to 1 and 0.		
+
 		data.append(temp)
+
 	f.close()
 
 	X=np.zeros(shape=(len(data),len(data[i]))) #no of examples and no of features
@@ -93,20 +95,20 @@ def plot(Train_error,Test_error,support_vectors,Sigmas):
 	
 	plt.plot(Sigmas,Train_error,color='r')
 	plt.plot(Sigmas,Test_error,color='b')
-	plt.xlabel("sigma")
+	plt.xlabel("Degree")
 	plt.ylabel("Train & Test Accuracy")
-	plt.title("Accuracy vs Sigma of Gaussian Kernel. \n(r-train\nb-test)\n")
+	plt.title("Accuracy vs Degree of Polynomial Kernel. \n(r-train\nb-test)\n")
 	plt.savefig("./class_error.png", bbox_inches='tight')
 	plt.clf()
 
 
 	plt.plot(Sigmas,support_vectors,color='r')
-	plt.xlabel("sigma")
+	plt.xlabel("Degree")
 	plt.ylabel("No of Support Vectors")
-	plt.title("No of Support Vectors vs sigma.")
+	plt.title("No of Support Vectors vs Degree.")
 	plt.savefig("./support_vectors.png", bbox_inches='tight')
 	plt.clf()
-
+'''
 X_train,Y_train=Matrices("train")
 X_test,Y_test=Matrices("test")
 
@@ -115,10 +117,10 @@ Test_error=[]
 Sigmas=[]
 support_vectors=[]
 
-sigma=0.0
+sigma=1
 
-while(sigma<0.1):
-	sigma+=0.1
+while(sigma<20):
+	sigma+=1
 	Sigmas.append(sigma)
 	print "called SMO"
 	alpha,bias= smo.SMO(X_train,Y_train,1.0,math.pow(10,-3),2,sigma)  #with varying sigma
@@ -131,4 +133,4 @@ while(sigma<0.1):
 	print sigma
 	support_vectors.append(a)
 	print "one call done"
-#plot(Train_error,Test_error,support_vectors,Sigmas)
+plot(Train_error,Test_error,support_vectors,Sigmas)'''

@@ -36,13 +36,13 @@ def predict(X,Y,alpha,b,x,sigma):
 	result=0.0
 
 	for i in range(X.shape[0]):
-		result+=(alpha[i]*Y[i]*gaussian_kernel(X[i,:] , x,sigma));
+		result+=(alpha[i]*Y[i]*polynomial_kernel(X[i,:] , x,sigma));
 
 	result+=b
 
 	return result
 
-def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
+def SMO(X,Y,C=0.05,tol=math.pow(10,-3),max_passes=50,sigma=1):
 	''' X has input data matrix. Y has the class labels. C is regularization parameter. tol is numerical tolerance. max_passes is max # of times to iterate wihtout changing alpha's
 
         Return Alpha and b.'''
@@ -81,9 +81,9 @@ def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 		
 				if (L==H):
 					continue
-				eta = 2*gaussian_kernel(X[i,:],X[j,:],sigma)
-				eta=eta-gaussian_kernel(X[i,:],X[i,:],sigma)
-				eta=eta-gaussian_kernel(X[j,:],X[j,:],sigma)
+				eta = 2*polynomial_kernel(X[i,:],X[j,:],sigma)
+				eta=eta-polynomial_kernel(X[i,:],X[i,:],sigma)
+				eta=eta-polynomial_kernel(X[j,:],X[j,:],sigma)
 			
 				if (eta >= 0):
 					continue
@@ -105,9 +105,9 @@ def SMO(X,Y,C=1.0,tol=math.pow(10,-5),max_passes=1,sigma=1):
 				alpha[i] += (Y[i]*Y[j]*(alpha_old[j] - alpha[j])) #both alphas are updated
 
 
-				ii = gaussian_kernel(X[i,:],X[i,:],sigma)
-				ij = gaussian_kernel(X[i,:],X[j,:],sigma)
-				jj = gaussian_kernel(X[j,:],X[j,:],sigma)			
+				ii = polynomial_kernel(X[i,:],X[i,:],sigma)
+				ij = polynomial_kernel(X[i,:],X[j,:],sigma)
+				jj = polynomial_kernel(X[j,:],X[j,:],sigma)			
 
 				b1= b-E[i]- (Y[i]*ii*(alpha[i]-alpha_old[i]))- (Y[j]*ij*(alpha[j]-alpha_old[j]))
 				b2= b-E[j]- (Y[i]*ij*(alpha[i]-alpha_old[i]))- (Y[j]*jj*(alpha[j]-alpha_old[j]))
