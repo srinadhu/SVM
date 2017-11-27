@@ -19,7 +19,7 @@ import random
 def main():
 	''' All procedures done through this '''
 
-	X_train,Y_train=svm.Matrices("aritificial_seperable_data","no") #get the data into matrixes
+	X_train,Y_train=svm.Matrices("aritificial_data","no") #get the data into matrixes
 
 	deg_of_kernel=1 #since linearly seperable
 

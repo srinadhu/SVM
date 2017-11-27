@@ -23,7 +23,7 @@ def main():
 
 	deg_of_kernel=1 #since linearly seperable
 
-	alpha,bias= smo.SMO(X_train,Y_train,5.0,math.pow(10,-3),100,deg_of_kernel)  #Calling the SMO procedure for getiing alpha and bias
+	alpha,bias= smo.SMO(X_train,Y_train,0.25,math.pow(10,-3),50,deg_of_kernel)  #Calling the SMO procedure for getiing alpha and bias
 
 	plot_decision_boundary(X_train,Y_train,alpha,bias)	 #plot the decision boundary
 
@@ -59,12 +59,12 @@ def plot_decision_boundary(X_train,Y_train,alpha,bias):
 	yy = (-w[0,0] / w[0,1])* xx - (bias+1) / w[0,1] #caluclating other co-ordnate
 	plt.plot(xx,yy,'m-')
 	
-	plt.xlim(0.0,6)
+	plt.xlim(0.0,7)
 	plt.ylim(0.0,7)
 
 	plt.xlabel("X1 feature")
 	plt.ylabel("X2 feature")
-	plt.text(5,6,"r:class 1\nb:class -1\n")
+	plt.text(6,6,"r:class 1\nb:class -1\n")
 	plt.savefig('plot.jpeg')
 
 main()
